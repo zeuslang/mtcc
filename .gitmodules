@@ -1,0 +1,3 @@
+[submodule "deps_test/tccfork"]
+	path = deps_test/tccfork
+	url = https://github.com/zeuslang/tccfork
