@@ -54,3 +54,8 @@ win32/include/stdatomic.h
 win32/include/tgmath.h
 
 libtcc.dylib
+
+# myte build artifacts
+.mtcc_arch
+include/
+win32/*.ilk

@@ -1600,7 +1600,13 @@ static int get_dllexports(int fd, char **pp)
         if (IMAGE_DIRECTORY_ENTRY_EXPORT >= oh.NumberOfRvaAndSizes)
             goto the_end_0;
         addr = oh.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
-    } else if (ih.Machine == 0x8664) {
+    } else if (ih.Machine == 0x8664 || ih.Machine == 0xAA64) {
+        /* 0x8664 = x64, 0xAA64 = ARM64. Both use PE32+ (64-bit optional header).
+         * On ARM64 Windows, System32 contains ARM64 DLLs even when the
+         * process is running under x64 emulation. TCC only needs the
+         * export *names* from these DLLs; the actual addresses are resolved
+         * at runtime by the OS loader via LoadLibraryA/GetProcAddress.
+         */
         IMAGE_OPTIONAL_HEADER64 oh;
         sec_hdroffset = opt_hdroffset + sizeof oh;
         if (!read_mem(fd, opt_hdroffset, &oh, sizeof oh))
