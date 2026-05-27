@@ -66,7 +66,6 @@ ST_FUNC void tccelf_new(TCCState *s)
     symtab_section = new_symtab(s, ".symtab", SHT_SYMTAB, 0,
                                 ".strtab",
                                 ".hashtab", SHF_PRIVATE);
-
     /* private symbol table for dynamic symbols */
     s->dynsymtab_section = new_symtab(s, ".dynsymtab", SHT_SYMTAB, SHF_PRIVATE|SHF_DYNSYM,
                                       ".dynstrtab",
@@ -1083,6 +1082,18 @@ ST_FUNC void relocate_syms(TCCState *s1, Section *symtab, int do_resolve)
 		    printf ("relocate_sym: %s -> 0x%lx\n", name, sym->st_value);
 #endif
                     goto found;
+                }
+#endif
+            /* On Windows PE, tcc_add_symbol adds to dynsymtab_section instead
+             * of dynsym.  Check there as a fallback for TCC_OUTPUT_MEMORY. */
+#if defined TCC_TARGET_PE
+                if (s1->dynsymtab_section) {
+                    int idx = find_elf_sym(s1->dynsymtab_section, name);
+                    if (idx) {
+                        ElfW(Sym) *esym = &((ElfW(Sym) *)s1->dynsymtab_section->data)[idx];
+                        sym->st_value = esym->st_value;
+                        goto found;
+                    }
                 }
 #endif
             /* if dynamic symbol exist, it will be used in relocate_section */
