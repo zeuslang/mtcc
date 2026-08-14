@@ -52,6 +52,7 @@ win32/include/tcclib.h
 win32/include/tccdefs.h
 win32/include/stdatomic.h
 win32/include/tgmath.h
+win32/include/tcc/
 
 libtcc.dylib
 
